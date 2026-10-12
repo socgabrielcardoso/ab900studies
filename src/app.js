@@ -22,6 +22,7 @@ const finishedDay=day=>F.every((_,p)=>done(day,p));
 const currDay=()=>D.days.find(d=>!finishedDay(d.day))?.day||30;
 const canStart=(day,phase)=>phase?done(day,phase-1):day===1||finishedDay(day-1);
 const progress=()=>Object.keys(s.completed).filter(k=>s.completed[k]).length;
+const rank=()=>{const p=progress();return p>=90?"Mestre dos Agentes":p>=66?"Arquiteto de Copilot":p>=36?"Guardião de Governança":p>=15?"Admin M365":"Aprendiz do Tenant"};
 const domainCards=id=>D.cards.filter(c=>c.domain===id);
 const cardHistory=id=>s.history.filter(h=>h.id===id);
 const reviewedCards=id=>new Set(s.history.filter(h=>h.domain===id).map(h=>h.id)).size;
@@ -83,7 +84,7 @@ function makeQuestion(card,variant=0){
  return {card,description:starters[(card.day+variant)%starters.length]+card.scene,options:getChoices(card)};
 }
 function sectionName(key){return ({journey:"Sua jornada",practice:"Arena de treino",glossary:"Glossário de IA",notes:"Notas de campo",shop:"Loja de Tokens",insights:"Painel de prontidão"})[key]||"Academia AB-900"}
-function iconFor(){return activeSkins[s.equipped]?.icon||"🤖"}
+function iconFor(){if(s.equipped==="base")return progress()>=90?"👑":progress()>=66?"🤖":progress()>=36?"🛡️":progress()>=15?"🧑🏻‍💻":"🐣";return activeSkins[s.equipped]?.icon||"🤖"}
 function nav(){
  const items=[["journey","🗺️","Minha jornada"],["practice","⚔️","Arena de treino"],["glossary","📚","Glossário"],["notes","📝","Minhas notas"],["shop","🛍️","Loja de IA"],["insights","📊","Meu desempenho"]];
  return `<aside class="sidebar"><a class="brand" href="#" data-action="go" data-view="journey" aria-label="Página inicial AB-900"><span class="brand-icon">🤖</span><span><strong>AB<span>900</span> Quest</strong><small>AI ACADEMY</small></span></a><nav class="nav" aria-label="Navegação">${items.map(([id,emo,label])=>`<button class="nav-btn ${ui.view===id?"active":""}" data-action="go" data-view="${id}" ${ui.view===id?'aria-current="page"':""}><span class="nav-emoji">${emo}</span><span class="nav-name">${label}</span></button>`).join("")}</nav><div class="nav-bottom"><div class="mentor-mini"><span class="face">👩🏽‍🚀</span><div><strong>DICA DA CAMILA</strong><p>Copilot não cria permissões. Ele pode revelar onde elas estão amplas demais.</p></div></div><div class="nav-footer">Projeto de estudos independente · v1.0</div></div></aside>`
@@ -93,7 +94,7 @@ function topbar(){
 }
 function hero(){
  const day=currDay(),n=progress(),pct=Math.round(n/90*100);
- return `<section class="hero" aria-label="Progresso da academia"><canvas class="hero-shader" aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-badge">✦ MISSÃO AB-900 · 30 DIAS · 90 FASES</span><h1>Domine a IA.<br><em>Governe o futuro.</em></h1><p>Esqueça os textões. Resolva incidentes, desbloqueie agentes e evolua até ser o mestre da administração Microsoft 365.</p><div class="btn-group"><button class="btn primary" data-action="open-day" data-day="${day}">🚀 ${n?"Continuar missão":"Começar jornada"} <span aria-hidden="true">→</span></button><button class="btn outline small" data-action="go" data-view="practice">⚔️ Revisão inteligente</button></div></div><div class="hero-robot"><div class="robot-orbit"></div><span class="robot-head">${iconFor()}</span></div></section><div class="stats-strip"><div class="stat-card"><span class="stat-icon">🎯</span><div><small>Prontidão para IA*</small><strong>${readiness()}%</strong></div></div><div class="stat-card"><span class="stat-icon">🧩</span><div><small>Fases concluídas</small><strong>${n}/90</strong></div></div><div class="stat-card"><span class="stat-icon">📅</span><div><small>Dia da jornada</small><strong>${day}/30</strong></div></div><div class="stat-card"><span class="stat-icon">⚡</span><div><small>Progresso mensal</small><strong>${pct}%</strong></div></div></div>`
+ return `<section class="hero" aria-label="Progresso da academia"><canvas class="hero-shader" aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-badge">✦ ${rank()} · 30 DIAS · 90 FASES</span><h1>Domine a IA.<br><em>Governe o futuro.</em></h1><p>Esqueça os textões. Resolva incidentes, desbloqueie agentes e evolua até ser o mestre da administração Microsoft 365.</p><div class="btn-group"><button class="btn primary" data-action="open-day" data-day="${day}">🚀 ${n?"Continuar missão":"Começar jornada"} <span aria-hidden="true">→</span></button><button class="btn outline small" data-action="go" data-view="practice">⚔️ Revisão inteligente</button></div></div><div class="hero-robot"><div class="robot-orbit"></div><span class="robot-head">${iconFor()}</span></div></section><div class="stats-strip"><div class="stat-card"><span class="stat-icon">🎯</span><div><small>Prontidão para IA*</small><strong>${readiness()}%</strong></div></div><div class="stat-card"><span class="stat-icon">🧩</span><div><small>Fases concluídas</small><strong>${n}/90</strong></div></div><div class="stat-card"><span class="stat-icon">📅</span><div><small>Dia da jornada</small><strong>${day}/30</strong></div></div><div class="stat-card"><span class="stat-icon">⚡</span><div><small>Progresso mensal</small><strong>${pct}%</strong></div></div></div>`
 }
 function mapMarkup(){
  let prev="";
@@ -235,7 +236,7 @@ function sessionMarkup(){
 }
 function resultMarkup(e){
  const r=e.result;
- return `<div class="results"><div class="trophy">${r.pass?"🏆":"🛡️"}</div><h2>${r.pass?"Missão cumprida!":"Missão precisa de reforço"}</h2><p>${r.pass?"Guilherme respira aliviado. Camila aprovou sua decisão.": "Nada de decorar no escuro: revise as dicas e tente de novo. O conhecimento se constrói."}</p><div class="result-score"><span>🎯 Precisão</span><strong>${r.percent}%</strong><span>${r.correct}/${r.total} acertos</span></div>${r.reward?`<p style="font-size:16px;color:var(--yellow)">🪙 +${r.reward} AITokens conquistados!</p>`:""}${r.timeout?'<p class="warning">⏱ O tempo acabou; respostas restantes foram contadas como não respondidas.</p>':""}<div class="btn-group"><button class="btn primary" data-action="close">${r.pass?"Voltar à jornada":"Fechar e revisar"}</button>${e.kind==="stage"?`<button class="btn outline" data-action="retry">🔁 Repetir fase</button>`:`<button class="btn outline" data-action="${e.kind==="mock"?"mock":"review"}">🔁 Novo treino</button>`}</div></div>`;
+ return `<div class="results"><div class="trophy">${r.pass?"🏆":"🛡️"}</div><h2>${r.pass?"Missão cumprida!":"Missão precisa de reforço"}</h2><p>${r.pass?"Guilherme respira aliviado. Camila aprovou sua decisão. Sua patente: ${rank()}.": "Nada de decorar no escuro: revise as dicas e tente de novo. O conhecimento se constrói."}</p><div class="result-score"><span>🎯 Precisão</span><strong>${r.percent}%</strong><span>${r.correct}/${r.total} acertos</span></div>${r.reward?`<p style="font-size:16px;color:var(--yellow)">🪙 +${r.reward} AITokens conquistados!</p>`:""}${r.timeout?'<p class="warning">⏱ O tempo acabou; respostas restantes foram contadas como não respondidas.</p>':""}<div class="btn-group"><button class="btn primary" data-action="close">${r.pass?"Voltar à jornada":"Fechar e revisar"}</button>${e.kind==="stage"?`<button class="btn outline" data-action="retry">🔁 Repetir fase</button>`:`<button class="btn outline" data-action="${e.kind==="mock"?"mock":"review"}">🔁 Novo treino</button>`}</div></div>`;
 }
 function finishSession(timeout=false){
  const e=ui.session;if(!e||e.result)return;
@@ -250,6 +251,7 @@ function finishSession(timeout=false){
   if(!done(e.day,e.phase)){
    s.completed[key]=true;reward=[30,45,60][e.phase];
    s.coins=Math.max(0,(s.coins||0)+reward);
+   if(e.phase===2)notify("📈 Dia "+e.day+" concluído! "+Math.round(progress()/90*100)+"% da trilha concluída.");
    if(e.day===30&&e.phase===2)notify("🏆 Jornada completa! Agora consolide nos simulados.");
   }
   s.scores[key]=Math.max(s.scores[key]||0,percent);
