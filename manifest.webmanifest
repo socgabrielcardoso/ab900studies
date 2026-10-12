@@ -1,0 +1,17 @@
+{
+  "name": "AB-900 Quest — Academia de Agentes",
+  "short_name": "AB-900 Quest",
+  "description": "Trilha interativa de 30 dias para o exame AB-900",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0e1022",
+  "theme_color": "#7558ff",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
