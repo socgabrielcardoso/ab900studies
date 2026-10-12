@@ -7,7 +7,7 @@ const content=readFileSync("src/content.js","utf8");
 function harness(){
  const handlers={},storage={};
  const root={innerHTML:"",addEventListener(name,fn){handlers[name]=fn},querySelector(){return null},contains(){return true}};
- const doc={getElementById(){return root},addEventListener(){},querySelector(){return null}};
+ const doc={getElementById(){return root},addEventListener(){},querySelector(){return null},createElement(){return {children:[],appendChild(item){this.children.push(item)},remove(){},style:{}}},body:{appendChild(){}}};
  const localStorage={getItem(k){return storage[k]||null},setItem(k,v){storage[k]=v},removeItem(k){delete storage[k]}};
  const win={innerWidth:1200,scrollTo(){}};runInNewContext(content,{window:win});
  const fake={
